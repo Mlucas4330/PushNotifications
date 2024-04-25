@@ -6,7 +6,9 @@ dotenv.config()
 
 const publicKey = process.env.PUBLIC_KEY
 
-WebPush.setVapidDetails('mailto:mlucas4330@gmail.com', publicKey, process.env.PRIVATE_KEY)
+const subject = process.env.NODE_ENV === 'dev' ? process.env.EMAIL : process.env.URL
+
+WebPush.setVapidDetails(subject, publicKey, process.env.PRIVATE_KEY)
 
 const router = Router()
 
@@ -15,9 +17,11 @@ router.get('/push/public_key', (_req, res) => {
 })
 
 router.post('/push/send', (req, res) => {
-    const { subscription } = req.body
+    const { subscription, notification, quantity } = req.body
 
-    WebPush.sendNotification(subscription, 'testando')
+    for (let i = 0; i < quantity; i++) {
+        WebPush.sendNotification(subscription, JSON.stringify(notification))
+    }
 })
 
 export default router
